@@ -31,12 +31,11 @@ public:
     void enter_magnetic_carlibration(int interval_ms = 0){
         char cmd[2] = {0x02, 0x00};
         this->write(0x01, cmd, 2);
+
          if(!ms){
         	wait_ms(interval_ms);
         	exit_carlibration();
         }
-
-
     }
     
     void enter_height_carlibration(int interval_ms = 0){
