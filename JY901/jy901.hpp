@@ -17,8 +17,6 @@ static const char JY_ADDR                = 0x50;
 static const char JY_901_DEFAULT_CONTENT = 0x8F;
 
 
-#define INTERFACE I2C
-#define EXTEND_INTERFACE_CLASS MyI2C
 
 
 /** hogehage class
@@ -40,14 +38,14 @@ public:
     * @remarks  Slave address is automatically settled 0x50.
     * @param bus : Pointer of I2C Instance (or Serial Instance).
     */
-    JY901(INTERFACE *bus): EXTEND_INTERFACE_CLASS(bus, JY_ADDR) {}
+    JY901(I2C *bus): MyI2C(bus, JY_ADDR) {}
 
     /** constructor 
     * @bref Create an instance from the address of I2C intance and I2C Address.
     * @param bus     :  Pointer of I2C Instance (or Serial Instance).
     * @param address :  Slave address number that you settled before.
     */
-    JY901(INTERFACE *bus,  char address): EXTEND_INTERFACE_CLASS(bus, address) {}
+    JY901(I2C *bus,  char address): MyI2C(bus, address) {}
     
 
     /** set_default_setting
