@@ -5,7 +5,7 @@ namespace JY901_Type{
             float roll;
             float pitch;
             float yow;
-        } JY_Pitting_Angle;
+        } JY_Pitch_Angle;
         typedef struct{
             float pressure;
             float height;
@@ -22,7 +22,7 @@ namespace JY901_Type{
             char hour;
             char min;
             char sec;
-            short milli_sec;
+            short ms;
         } JY_Time;
 
         typedef struct{
@@ -42,7 +42,7 @@ namespace JY901_Type{
             struct{
                     float quat0, quat1, quat2, quat3;
             };
-            float quat[4]
+            float quat[4];
         } JY_Quaternion;
 
     }
@@ -74,7 +74,7 @@ namespace JY901_Type{
         GPS_921600  = 0x09,
         GPS_DEFAULT = 0x02,
         GPS_NO_DEVICE = 0xFF
-    } JY_GPS_Baud;
+    } JY_Serial_Baud;
 
     typedef enum{
         JY_ANALOG = 0x00,
