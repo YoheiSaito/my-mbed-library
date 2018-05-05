@@ -20,19 +20,37 @@ public:
     -------------------*/
     
     // setter about carlibration
-    void enter_gyroscope_carlibration(void){
-        this->write(0x01, 1);
+    void enter_gyroscope_carlibration(int interval_ms = 0){
+        char cmd[2] = {0x01, 0x00};
+        this->write(0x01, cmd, 2);
+        if(!ms){
+        	wait_ms(interval_ms);
+        	exit_carlibration();
+        }
     }
-    void enter_magnetic_carlibration(void){
-        this->write(0x01, 2);
-    }
-    void exit_carlibration(void){
-        this->write(0x01, 0);
-    }
-    void reset_carlibration(void){
-        this->write(0x01, 3);
+    void enter_magnetic_carlibration(int interval_ms = 0){
+        char cmd[2] = {0x02, 0x00};
+        this->write(0x01, cmd, 2);
+
     }
     
+    void enter_height_carlibration(int interval_ms = 0){
+    	char cmd[2] = {0x03, 0x00};
+        this->write(0x01, cmd, 2);
+        if(!ms){
+        	wait_ms(interval_ms);
+        	exit_carlibration();
+        }
+    }
+    
+    void exit_carlibration(void){
+        char cmd[2] = {0x03, 0x00};
+        this->write(0x01, cmd, 2);
+        if(!ms){
+        	wait_ms(interval_ms);
+        	exit_carlibration();
+        }
+    }
     // setter about sample speed 
     void set_return_rate(JY_Sampling_Rate rate){
         this->write(0x03, (char)rate);
@@ -106,18 +124,18 @@ public:
 
         char buff[6];
         this->read(0x3D, buff, 6);
-        angle_state.roll     = char_array_to_int(&buff[0]) / 32768.0f * 180;
-        angle_state.pitch    = char_array_to_int(&buff[2]) / 32768.0f * 180;
-        angle_state.yow      = char_array_to_int(&buff[4]) / 32768.0f * 180;
+        angle_state.roll     = ((get_data[1]<< 8 ) | get_data[0] ) / 32768.0f * 180;
+        angle_state.pitch    = ((get_data[3]<< 8 ) | get_data[2] ) / 32768.0f * 180;
+        angle_state.yow      = ((get_data[5]<< 8 ) | get_data[4] ) / 32768.0f * 180;
         return angle_state;
     }
     
     void get_pitting_angle(float *roll, float *pitch, float *yow){
         char buff[6];
         this->read(0x3D, buff, 6);
-        angle_state.roll     = char_array_to_int(&buff[0]) / 32768.0f * 180;
-        angle_state.pitch    = char_array_to_int(&buff[2]) / 32768.0f * 180;
-        angle_state.yow      = char_array_to_int(&buff[4]) / 32768.0f * 180;
+        angle_state.roll     = ((get_data[1]<< 8 ) | get_data[0] ) / 32768.0f * 180;
+        angle_state.pitch    = ((get_data[3]<< 8 ) | get_data[2] ) / 32768.0f * 180;
+        angle_state.yow      = ((get_data[5]<< 8 ) | get_data[4] ) / 32768.0f * 180;
        
         *roll     = angle_state.roll;
         *pitch    = angle_state.pitch;
@@ -127,17 +145,17 @@ public:
     float get_roll(void){
         char buff[2];
         this->read(0x3D, buff, 2);
-        return char_array_to_int(buff) / 32768.0f * 180;
+        return two_char_array_to_int(buff) / 32768.0f * 180;
     }
     float get_pitch(void){
         char buff[2];
         this->read(0x3E, buff, 2);
-        return char_array_to_int(buff) / 32768.0f * 180;
+        return two_char_array_to_int(buff) / 32768.0f * 180;
     }
     float get_yow(void){
         char buff[2];
         this->read(0x3F, buff, 2);
-        return char_array_to_int(buff) / 32768.0f * 180;
+        return two_char_array_to_int(buff) / 32768.0f * 180;
     }
 
 
@@ -178,42 +196,46 @@ public:
         JY_Dim_3D ret;
         char buff[8];
         this->read(0x51, buff, 8);
-        ret.x = char_array_to_int(&buff[0]) / 32768.0f * 16;
-        ret.y = char_array_to_int(&buff[2]) / 32768.0f * 16;
-        ret.z = char_array_to_int(&buff[4]) / 32768.0f * 16;
-        ret.temp = char_array_to_int(&buff[6]) /100.0f;
+        ret.x 		= ((get_data[1]<< 8 ) | get_data[0] ) / 32768.0f * 16;
+        ret.y 		= ((get_data[3]<< 8 ) | get_data[2] ) / 32768.0f * 16;
+        ret.z 		= ((get_data[5]<< 8 ) | get_data[4] ) / 32768.0f * 16;
+        ret.temp	= ((get_data[7]<< 8 ) | get_data[6] ) /100.0f;
         return ret;
     }
+
     JY_Dim_3D get_Angular_valocity(void){
         JY_Dim_3D ret;
         char buff[8];
         this->read(0x52, buff, 8);
-        ret.x = char_array_to_int(&buff[0]) / 32768.0f * 16;
-        ret.y = char_array_to_int(&buff[2]) / 32768.0f * 16;
-        ret.z = char_array_to_int(&buff[4]) / 32768.0f * 16;
-        ret.temp = char_array_to_int(&buff[6]) /100.0f;
+        ret.x 		= ((get_data[1]<< 8 ) | get_data[0] ) / 32768.0f * 16;
+        ret.y 		= ((get_data[3]<< 8 ) | get_data[2] ) / 32768.0f * 16;
+        ret.z 		= ((get_data[5]<< 8 ) | get_data[4] ) / 32768.0f * 16;
+        ret.temp	= ((get_data[7]<< 8 ) | get_data[6] ) /100.0f;
         return ret;
     }
+
     JY_Dim_3D get_Magnetic_output(void){
         JY_Dim_3D ret;
         char buff[8];
         this->read(0x54, buff, 8);
-        ret.x = char_array_to_int(&buff[0]) / 32768.0f * 16;
-        ret.y = char_array_to_int(&buff[2]) / 32768.0f * 16;
-        ret.z = char_array_to_int(&buff[4]) / 32768.0f * 16;
-        ret.temp = char_array_to_int(&buff[6]) /100.0f;
+        ret.x 		= ((get_data[1]<< 8 ) | get_data[0] ) / 32768.0f * 16;
+        ret.y 		= ((get_data[3]<< 8 ) | get_data[2] ) / 32768.0f * 16;
+        ret.z 		= ((get_data[5]<< 8 ) | get_data[4] ) / 32768.0f * 16;
+        ret.temp	= ((get_data[7]<< 8 ) | get_data[6] ) /100.0f;
         return ret;
     }
+
     JY_Pin_Status get_pin_status(void){
         JY_Pin_Status ret;
         char buff[8];
         this->read(0x55, buff, 8);
-        ret.P0 = char_array_to_int(&buff[0]);
-        ret.P1 = char_array_to_int(&buff[2]);
-        ret.P2 = char_array_to_int(&buff[4]);
-        ret.P3 = char_array_to_int(&buff[6]);
+        re		t.P0 = ((get_data[1]<< 8 ) | get_data[0] );
+        re		t.P1 = ((get_data[3]<< 8 ) | get_data[2] );
+        re		t.P2 = ((get_data[5]<< 8 ) | get_data[4] );
+        ret.P3	= ((get_data[7]<< 8 ) | get_data[6] );
         return ret;
     }
+
     float convert_pinstatus_to_voltage(short pin_status, float suply_voltage = 3.5){
         return pin_status/(suply_voltage - 0.2f);
     }
@@ -221,15 +243,16 @@ public:
     	JY_Quaternion ret;
         char buff[8];
         this->read(0x59, buff, 8);
-        ret.quat0 = char_array_to_int(&buff[0]) / 32768.0f;
-        ret.quat1 = char_array_to_int(&buff[2]) / 32768.0f;
-        ret.quat2 = char_array_to_int(&buff[4]) / 32768.0f;
-        ret.quat3 = char_array_to_int(&buff[6]) / 32768.0f;
+        ret.qu		at0 = ((get_data[1]<< 8 ) | get_data[0] ) / 32768.0f;
+        ret.qu		at1 = ((get_data[3]<< 8 ) | get_data[2] ) / 32768.0f;
+        ret.qu		at2 = ((get_data[5]<< 8 ) | get_data[4] ) / 32768.0f;
+        ret.quat3	= ((get_data[7]<< 8 ) | get_data[6] ) / 32768.0f;
         return ret;
     }
+
 private:
 
-    int char_array_to_int(char get_data[]) {
+    int two_char_array_to_int(char get_data[]) {
         return((get_data[1]<< 8 ) | get_data[0] );
     }
     JY_Pitting_Angle angle_state;
