@@ -31,6 +31,11 @@ public:
     void enter_magnetic_carlibration(int interval_ms = 0){
         char cmd[2] = {0x02, 0x00};
         this->write(0x01, cmd, 2);
+         if(!ms){
+        	wait_ms(interval_ms);
+        	exit_carlibration();
+        }
+
 
     }
     
@@ -42,14 +47,10 @@ public:
         	exit_carlibration();
         }
     }
-    
+
     void exit_carlibration(void){
         char cmd[2] = {0x03, 0x00};
         this->write(0x01, cmd, 2);
-        if(!ms){
-        	wait_ms(interval_ms);
-        	exit_carlibration();
-        }
     }
     // setter about sample speed 
     void set_return_rate(JY_Sampling_Rate rate){
